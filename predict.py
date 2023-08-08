@@ -5,15 +5,23 @@ Spencer Karofsky
 from ultralytics import YOLO
 import numpy as np
 import cv2
+import datetime
 
-model = YOLO("yolov8n.pt")  # load pretrained YOLOv8 model on COCO
+# clear file from previous run and write header for current run
+with open('traffic.txt','w') as f:
+    f.write('Traffic Log\n\n')
+
+# load pretrained YOLOv8 model on MS COCO dataset
+model = YOLO("yolov8n.pt")
 
 # Creating a VideoCapture object to read the video
 cap = cv2.VideoCapture('highway.mp4')
 
+# keep track of number of frames
+frame_count = 0
+
 # Loop until the end of the video
 while (cap.isOpened()):
-
     # Capture frame-by-frame
     ret, frame = cap.read()
     frame = cv2.resize(frame,(1200,700))
@@ -42,9 +50,24 @@ while (cap.isOpened()):
         label = class_names.get(int(cls[i]))
         cv2.putText(frame,label,(x1,y1-5),cv2.FONT_HERSHEY_DUPLEX,.75 ,(0,255,0),2)
 
+        frame_count += 1  # update the frame
+        # every 300 frames (0-299), record the relative traffic to a file
+        if frame_count == 299:
+            frame_count = 0
+            # count the number of cars, motorcycles, busses, and trucks
+            traffic_count = 0
+            for j in range(len(results[0])):
+                label = class_names.get(int(cls[j]))
+                if label == 'car' or label == ' motorcycle' or label == 'truck' or label == 'bus':
+                    traffic_count += 1
+            with open('traffic.txt', 'a') as f:
+                dt = str(datetime.date.today()) + ': ' + str(datetime.datetime.now()) + '\n' # date and time
+                f.write(dt)
+                traffic = 'Traffic: ' + str(traffic_count) + ' vehicles\n\n'
+                f.write(traffic)
 
     # Display the resulting frame
-    cv2.imshow('Frame', frame)
+    cv2.imshow('Traffic Footage', frame)
     # define q as the exit button
     if cv2.waitKey(25) & 0xFF == ord('q'):
         break
@@ -55,6 +78,8 @@ cap.release()
 cv2.destroyAllWindows()
 
 
+
+
 '''
 Sources:
 1) https://github.com/ultralytics/ultralytics
@@ -63,5 +88,5 @@ Sources:
 4) https://www.geeksforgeeks.org/python-process-images-of-a-video-using-opencv/
 5) https://docs.opencv.org/3.4/dc/da5/tutorial_py_drawing_functions.html
 6) https://www.tutorialspoint.com/how-to-change-the-contrast-and-brightness-of-an-image-using-opencv-in-python
-7) 
+7) https://docs.python.org/3/library/datetime.html
 '''
