@@ -61,9 +61,9 @@ while (cap.isOpened()):
                 if label == 'car' or label == ' motorcycle' or label == 'truck' or label == 'bus':
                     traffic_count += 1
             with open('traffic.txt', 'a') as f:
-                dt = str(datetime.date.today()) + ': ' + str(datetime.datetime.now()) + '\n' # date and time
+                dt = str(datetime.datetime.now()) + ': ' # date and time
                 f.write(dt)
-                traffic = 'Traffic: ' + str(traffic_count) + ' vehicles\n\n'
+                traffic = str(traffic_count) + ' vehicles\n'
                 f.write(traffic)
 
     # Display the resulting frame
