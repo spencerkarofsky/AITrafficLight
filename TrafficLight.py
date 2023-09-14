@@ -2,7 +2,7 @@
 Traffic Sign Class
 """
 import pandas as pd
-import queue
+import random
 
 class TrafficSign:
     # Variables and Constants:
@@ -19,6 +19,7 @@ class TrafficSign:
     def __init__(self):
         dataframe_columns = ['Date/Time', 'Side 1', 'Side 2', 'Side 3', 'Side 4']
         self.traffic_dataframe = pd.DataFrame(columns=dataframe_columns)
+        green_light_list = []
 
     # Methods
 
@@ -79,7 +80,7 @@ class TrafficSign:
     Sets street's light to green for t seconds
     '''
     def set_green_light(self,street,t):
-        pass
+        self.green_light_list.append(street)
 
     '''
     set_yellow_light()
@@ -107,3 +108,67 @@ class TrafficSign:
     '''
     def set_flash_red(self,street):
         pass
+
+    '''
+    get_last_green()
+    Inputs: none
+    Returns: last_street_green, the last street to have a green light
+    Used to determine which street gets the green light when they have equal traffic
+    '''
+    def get_last_green(self):
+        # The last street with the green light is the last item (street) on the green light list
+        last_street_green = self.green_light_list[-1]
+        return last_street_green
+
+    def set_traffic_lights(self):
+        # Case 1: All sides have less than 2 cars; intersection will act as a 4-way stop.
+        if self.traffic_dataframe.iloc[-1, 1] <= 2 and self.traffic_dataframe.iloc[-1, 2] <= 2 and self.traffic_dataframe.iloc[-1, 3] <= 2 and self.traffic_dataframe.iloc[-1, 4] <= 2:
+            # turn all greens and yellows off; all reds  blink to signal 4-way stop
+            self.set_flash_red('Street 1')
+            self.set_flash_red('Street 2')
+        # Case 2: some sides have more than 2 cars, so the ratio between the 2 streets will be calculated using the calculate_traffic_ratio function.
+        # That ratio will then be used to determine the timing of the lights.
+        else:
+            ratio = self.calculate_traffic_ratio(self.traffic_dataframe.iloc[-1])
+            # Case A: Street 2 has more traffic than Street 1; Street 2 gets green light priority
+            if ratio < 1:
+                # Green light time = a constant * the average number of vehicles on a given street
+                green_light_time = self.get_green_light_time('Side 2')
+
+                # Set street 2 lights (green[1] and green[3]) to green and street 1 lights to red.
+
+            # Case B: Street 1 has more traffic than Street 2; Street 1 gets green light priority.
+            elif ratio > 1:
+                # Green light time = a constant * the average number of vehicles on a given street
+                green_light_time = self.get_green_light_time('Side 2')
+
+                # Set street 1 lights (green[0] and green[2]) to green and street 2 lights to red.
+
+            else:
+                # The streets have equal traffic amounts.
+
+                # If traffic_dataframe row is first row, randomly select street to get green light priority
+                current_row_index = self.traffic_dataframe.index.get_loc(
+                    self.traffic_dataframe.index[0])
+                if current_row_index == 0:
+                    random_street = random.randint(1, 2)
+                    if random_street == 1:
+                        # Street 1 gets green light priority
+                        green_light_time = self.get_green_light_time('Side 1')
+                        # Set green and red lights
+                    else:
+                        # Street 2 gets green light priority
+                        green_light_time = self.get_green_light_time('Side 2')
+                        # Set green and red lights
+                # Else, give green light priority to the last street to have red light.
+                else:
+                    if (self.traffic_dataframe.iloc[-2, 1] + self.traffic_dataframe.iloc[-2, 3]) > (
+                            self.traffic_dataframe.iloc[-2, 2] + self.traffic_dataframe.iloc[-2, 4]):
+                        pass
+                    else:
+                        street_green = self.get_last_green()
+                        self.set_green_light(street_green)
+                        if street_green == 'Street 1':
+                            self.set_red_light('Street 2')
+                        else:
+                            self.set_red_light('Street 1')
