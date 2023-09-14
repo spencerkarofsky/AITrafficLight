@@ -13,10 +13,10 @@ class TrafficSign:
     # yellows = [None, None,None,None]
 
     # Constants
-    LIGHT_CONSTANT = 2  # time, in seconds, per vehicle, of green light time
+    VEHICLE_TIME_CONSTANT = 2  # time, in seconds, per vehicle, of green light time
 
     # Constructor
-    def __int__(self):
+    def __init__(self):
         dataframe_columns = ['Date/Time', 'Side 1', 'Side 2', 'Side 3', 'Side 4']
         self.traffic_dataframe = pd.DataFrame(columns=dataframe_columns)
 
@@ -56,5 +56,54 @@ class TrafficSign:
         # Calculate the average traffic amount for both streets
         vehicles = data_row[1] + data_row[2] + data_row[3] + data_row[4]
         return vehicles
+    '''
+    get_green_light_time()
+    Inputs: street, the string value for street (either 1 or 2)
+    Returns: green_light_time, the amount of time, in seconds, for the green light
+    Calculates the time for a green light based on the average amount of vehicles between both sides of a street, then multiplies this value by a constant.
+    '''
+    def get_green_light_time(self,street):
+        # Green light time = a constant * the average number of vehicles on a given street
+        if street == 'Street 1':
+            green_light_time = self.VEHICLE_TIME_CONSTANT * ((self.traffic_dataframe.iloc[-1,1] + self.traffic_dataframe.iloc[-1,3]) / 2)
+        elif street == 'Street 2':
+            green_light_time = self.VEHICLE_TIME_CONSTANT * ((self.traffic_dataframe.iloc[-1, 3] + self.traffic_dataframe.iloc[-1, 4]) / 2)
+        else:
+            green_light_time = 0
+        return green_light_time
 
+    '''
+    set_green_light()
+    Inputs: street (the street), t (time, in seconds)
+    Returns: none
+    Sets street's light to green for t seconds
+    '''
+    def set_green_light(self,street,t):
+        pass
 
+    '''
+    set_yellow_light()
+    Inputs: street (the street), t (time, in seconds)
+    Returns: none
+    Sets street's light to yellow for 3 seconds
+    '''
+    def set_yellow_light(self,street,t=3):
+        pass
+
+    '''
+    set_red_light()
+    Inputs: street (the street)
+    Returns: none
+    Sets street's light to red
+    '''
+    def set_red_light(self,street):
+        pass
+
+    '''
+    set_flash_red()
+    Inputs: street (the street), t (time, in seconds)
+    Returns: none
+    Sets street's light to flash red
+    '''
+    def set_flash_red(self,street):
+        pass
