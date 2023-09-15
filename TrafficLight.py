@@ -3,6 +3,7 @@ Traffic Sign Class
 """
 import pandas as pd
 import random
+import time
 
 class TrafficSign:
     # Variables and Constants:
@@ -15,6 +16,9 @@ class TrafficSign:
     # Constants
     VEHICLE_TIME_CONSTANT = 2  # time, in seconds, per vehicle, of green light time
 
+    '''
+    
+    '''
     # Constructor
     def __init__(self):
         dataframe_columns = ['Date/Time', 'Side 1', 'Side 2', 'Side 3', 'Side 4']
@@ -120,6 +124,25 @@ class TrafficSign:
         last_street_green = self.green_light_list[-1]
         return last_street_green
 
+    '''
+    set_traffic_light()
+    Inputs: none
+    Returns: none
+    Controls the traffic light lights based on the following logic:
+    
+    * Do all streets have less than 2 cars?
+        * Yes: Both streets flash red light; intersection will function as a 4-way stop
+        * No:
+            * Compare traffic ratio between the two streets (ratio < 1: Street 2 has more traffic than Street 1; ratio > 1: Street 1 has more traffic than Street 2)
+            * Is ratio < 1?
+                * Street 1 (Sides 1 & 3) get green light; Street 2 (Sides 2 & 4) get red light.
+            * Is ratio > 1:
+                * Street 2 gets green light; Street 1 gets red light
+            * Does ratio = 1 (both streets have the same amount of traffic)?
+                * Is there an existing data row other than the current one (is this not the first iteration of the while true loop)?
+                    * Yes: Randomly select one street to start with the green light and the other will start with red light.
+                    * No: The street that previously had a green light will now have a red light, and the other street gets red light
+    '''
     def set_traffic_lights(self):
         # Case 1: All sides have less than 2 cars; intersection will act as a 4-way stop.
         if self.traffic_dataframe.iloc[-1, 1] <= 2 and self.traffic_dataframe.iloc[-1, 2] <= 2 and self.traffic_dataframe.iloc[-1, 3] <= 2 and self.traffic_dataframe.iloc[-1, 4] <= 2:
