@@ -1,3 +1,4 @@
+  GNU nano 5.4                                                                                          Detector.py                                                                                                   
 '''
 Detector Class
 This class creates an object that detects object
@@ -8,7 +9,7 @@ class Detector:
     # Constructor
     def __init__(self):
         # Load pretrained YOLOv8 model on MS COCO dataset
-        model = YOLO("yolov8n.pt")
+        self.model = YOLO("yolov8n.pt")
 
     # Methods
 
@@ -23,6 +24,7 @@ class Detector:
         for detection in detections:
             cls = detection.boxes.cls
 
+
         # Dictionary of COCO classes
         class_names = detection.names
 
@@ -31,6 +33,7 @@ class Detector:
             for j in range(len(detections[0])):
                 label = class_names.get(int(cls[j]))
                 objects.append(label)
+        print(objects)
         return objects
 
 
