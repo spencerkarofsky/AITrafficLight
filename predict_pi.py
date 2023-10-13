@@ -1,9 +1,6 @@
 """
 AI-Controlled Traffic Light
-Spencer Karofsky
-
-predict.py draws bounding boxes around all COCO class objects, using the pretrained YOLOv8 model with their corresponding labels.
-The program then counts the amount of vehicles (cars, trucks, motorcycles, and buses) and writes this amount along with the date and time to a gen>
+Spencer R. Karofsky
 """
 import cv2
 import datetime
@@ -11,13 +8,8 @@ import os
 import Detector
 import Motor
 import TrafficLight
-import random
 
-
-# Constants
-VEHICLE_TIME_CONSTANT = 2  # time, in seconds, per vehicle, of green light time
-
-# Functions
+# Global Function
 '''
 take_pic()
 Inputs: none
@@ -27,6 +19,9 @@ Takes and saves a picture
 def take_pic():  # take picture using fswebcam command line tool
     return os.system('fswebcam -r 1000x600 -S 3 --jpeg 50 --save img.jpg')
 
+'''
+main()
+'''
 def main():
     # Create instance of Detector class
     detector = Detector()
@@ -60,7 +55,7 @@ def main():
             # Get number of vehicles from detections list
             vehicle_count = 0
             for object in detections:
-                if object in ["car", "motorcycle","bus","truck"]:
+                if object in ['car', 'motorcycle','bus','truck']:
                     vehicle_count += 1
 
             # Append traffic_count value to data_row list (to later be added to the traffic_dataframe)
