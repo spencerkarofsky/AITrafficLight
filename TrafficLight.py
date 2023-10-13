@@ -4,27 +4,31 @@ Traffic Sign Class
 import pandas as pd
 import random
 import time
+import RPi.GPIO as GPIO
 
-class TrafficSign:
+class TrafficLight:
     # Variables and Constants:
 
     # LED pins
-    # reds = [None,None,None,None]
-    # greens = [None, None, None, None]
-    # yellows = [None, None,None,None]
+    reds = [3,7,13,8]
+    greens = [5,11,15,10]
+
 
     # Constants
     VEHICLE_TIME_CONSTANT = 2  # time, in seconds, per vehicle, of green light time
 
-    '''
-    
-    '''
     # Constructor
     def __init__(self):
         dataframe_columns = ['Date/Time', 'Side 1', 'Side 2', 'Side 3', 'Side 4']
         self.traffic_dataframe = pd.DataFrame(columns=dataframe_columns)
         green_light_list = []
-
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BOARD)
+        # For defining more than 1 GPIO channel as input/output use
+        GPIO.setup(self.reds, GPIO.OUT)
+        GPIO.setup(self.greens, GPIO.OUT)
+        GPIO.output(self.greens,GPIO.HIGH)
+        GPIO.output(self.reds,GPIO.HIGH)
     # Methods
 
     '''
@@ -83,8 +87,19 @@ class TrafficSign:
     Returns: none
     Sets street's light to green for t seconds
     '''
-    def set_green_light(self,street,t):
-        self.green_light_list.append(street)
+    def set_green_light(self,street):
+#        self.green_light_list.append(street)
+        time.sleep(1)
+        if street == 'Street 1':
+            GPIO.output(self.greens[0],GPIO.LOW)
+            GPIO.output(self.greens[2],GPIO.LOW)
+            GPIO.output(self.reds[0],GPIO.HIGH)
+            GPIO.output(self.reds[2],GPIO.HIGH)
+        elif street == 'Street 2':
+            GPIO.output(self.greens[1],GPIO.LOW)
+            GPIO.output(self.greens[3],GPIO.LOW)
+            GPIO.output(self.reds[1],GPIO.HIGH)
+            GPIO.output(self.reds[3],GPIO.HIGH)
 
     '''
     set_yellow_light()
@@ -92,8 +107,27 @@ class TrafficSign:
     Returns: none
     Sets street's light to yellow for 3 seconds
     '''
-    def set_yellow_light(self,street,t=3):
-        pass
+    def set_yellow_light(self,street):
+        if street == 'Street 1':
+            GPIO.output(self.greens[0],GPIO.LOW)
+            GPIO.output(self.greens[2],GPIO.LOW)
+            GPIO.output(self.reds[0],GPIO.LOW)
+            GPIO.output(self.reds[2],GPIO.LOW)
+            time.sleep(3)
+          #  GPIO.output(self.greens[0],GPIO.LOW)
+         #   GPIO.output(self.greens[2],GPIO.LOW)
+        #    GPIO.output(self.reds[0],GPIO.LOW)
+       #     GPIO.output(self.reds[2],GPIO.LOW)
+        elif street == 'Street 2':
+            GPIO.output(self.greens[1],GPIO.LOW)
+            GPIO.output(self.greens[3],GPIO.LOW)
+            GPIO.output(self.reds[1],GPIO.LOW)
+            GPIO.output(self.reds[3],GPIO.LOW)
+            time.sleep(3)
+          #  GPIO.output(self.greens[1],GPIO.LOW)
+          #  GPIO.output(self.greens[3],GPIO.LOW)
+         #   GPIO.output(self.reds[1],GPIO.LOW)
+         #   GPIO.output(self.reds[3],GPIO.LOW)
 
     '''
     set_red_light()
@@ -102,7 +136,34 @@ class TrafficSign:
     Sets street's light to red
     '''
     def set_red_light(self,street):
-        pass
+        if street == 'Street 1':
+            self.set_yellow_light('Street 1')
+            GPIO.output(self.greens[0],GPIO.HIGH)
+            GPIO.output(self.greens[2],GPIO.HIGH)
+            GPIO.output(self.reds[0],GPIO.LOW)
+            GPIO.output(self.reds[2],GPIO.LOW)
+        elif street == 'Street 2':
+            self.set_yellow_light('Street 2')
+            GPIO.output(self.greens[1],GPIO.HIGH)
+            GPIO.output(self.greens[3],GPIO.HIGH)
+            GPIO.output(self.reds[1],GPIO.LOW)
+            GPIO.output(self.reds[3],GPIO.LOW)
+
+    '''
+    lights_off()
+    Inputs: none
+    Returns: none
+    Turns all lights off
+    '''
+    def lights_off(self):
+        GPIO.output(self.greens[1],GPIO.HIGH)
+        GPIO.output(self.greens[3],GPIO.HIGH)
+        GPIO.output(self.reds[1],GPIO.HIGH)
+        GPIO.output(self.reds[3],GPIO.HIGH)
+        GPIO.output(self.greens[0],GPIO.HIGH)
+        GPIO.output(self.greens[2],GPIO.HIGH)
+        GPIO.output(self.reds[0],GPIO.HIGH)
+        GPIO.output(self.reds[2],GPIO.HIGH)
 
     '''
     set_flash_red()
@@ -111,7 +172,12 @@ class TrafficSign:
     Sets street's light to flash red
     '''
     def set_flash_red(self,street):
-        pass
+        while True:
+            GPIO.output(self.reds,GPIO.LOW)
+            GPIO.output(self.greens,GPIO.HIGH)
+            time.sleep(1)
+            self.lights_off()
+            time.sleep(1)
 
     '''
     get_last_green()
@@ -144,6 +210,7 @@ class TrafficSign:
                     * No: The street that previously had a green light will now have a red light, and the other street gets red light
     '''
     def set_traffic_lights(self):
+        print(self.traffic_dataframe)
         # Case 1: All sides have less than 2 cars; intersection will act as a 4-way stop.
         if self.traffic_dataframe.iloc[-1, 1] <= 2 and self.traffic_dataframe.iloc[-1, 2] <= 2 and self.traffic_dataframe.iloc[-1, 3] <= 2 and self.traffic_dataframe.iloc[-1, 4] <= 2:
             # turn all greens and yellows off; all reds  blink to signal 4-way stop
@@ -159,14 +226,16 @@ class TrafficSign:
                 green_light_time = self.get_green_light_time('Side 2')
 
                 # Set street 2 lights (green[1] and green[3]) to green and street 1 lights to red.
-
+                self.set_red_light('Street 1')
+                self.set_green_light('Street 2')
             # Case B: Street 1 has more traffic than Street 2; Street 1 gets green light priority.
             elif ratio > 1:
                 # Green light time = a constant * the average number of vehicles on a given street
                 green_light_time = self.get_green_light_time('Side 2')
 
                 # Set street 1 lights (green[0] and green[2]) to green and street 2 lights to red.
-
+                self.set_red_light('Street 2')
+                self.set_green_light('Street 1')
             else:
                 # The streets have equal traffic amounts.
 
@@ -179,10 +248,14 @@ class TrafficSign:
                         # Street 1 gets green light priority
                         green_light_time = self.get_green_light_time('Side 1')
                         # Set green and red lights
+                        self.set_red_light('Street 2')
+                        self.set_green_light('Street 1')
                     else:
                         # Street 2 gets green light priority
                         green_light_time = self.get_green_light_time('Side 2')
                         # Set green and red lights
+                        self.set_red_light('Street 1')
+                        self.set_green_light('Street 2')
                 # Else, give green light priority to the last street to have red light.
                 else:
                     if (self.traffic_dataframe.iloc[-2, 1] + self.traffic_dataframe.iloc[-2, 3]) > (
@@ -195,3 +268,4 @@ class TrafficSign:
                             self.set_red_light('Street 2')
                         else:
                             self.set_red_light('Street 1')
+
