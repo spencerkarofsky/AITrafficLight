@@ -20,7 +20,7 @@ class TrafficLight:
 
     # Constructor
     def __init__(self):
-        dataframe_columns = ['Date/Time', 'Side 1', 'Side 2', 'Side 3', 'Side 4']
+        dataframe_columns = ['Date/Time', 'Side 1', 'Side 2', 'Side 3', 'Side 4', 'Green Decision']
         self.traffic_dataframe = pd.DataFrame(columns=dataframe_columns)
         self.green_light_list = []
      #   GPIO.setwarnings(False)
@@ -96,17 +96,23 @@ class TrafficLight:
         green_light_list_element = [street,datetime.now()]
         self.green_light_list.append(green_light_list_element)
         time.sleep(1)
-     #   if street == 'Street 1':
+        if street == 'Street 1':
+            last_row_index = self.traffic_dataframe.index[-1]  # Get the index of the last row
+            last_column_name = self.traffic_dataframe.columns[-1]  # Get the name of the last column
+            self.traffic_dataframe.loc[last_row_index, last_column_name] = 'Street 1'
             # Append the new column to the DataFrame
-      #      GPIO.output(self.greens[0],GPIO.LOW)
-       ##     GPIO.output(self.greens[2],GPIO.LOW)
-       #     GPIO.output(self.reds[0],GPIO.HIGH)
-       #     GPIO.output(self.reds[2],GPIO.HIGH)
-     #   elif street == 'Street 2':
-         #   GPIO.output(self.greens[1],GPIO.LOW)
-        #    GPIO.output(self.greens[3],GPIO.LOW)
-        #    GPIO.output(self.reds[1],GPIO.HIGH)
-       #     GPIO.output(self.reds[3],GPIO.HIGH)
+            GPIO.output(self.greens[0],GPIO.LOW)
+            GPIO.output(self.greens[2],GPIO.LOW)
+            GPIO.output(self.reds[0],GPIO.HIGH)
+            GPIO.output(self.reds[2],GPIO.HIGH)
+        elif street == 'Street 2':
+            last_row_index = self.traffic_dataframe.index[-1]  # Get the index of the last row
+            last_column_name = self.traffic_dataframe.columns[-1]  # Get the name of the last column
+            self.traffic_dataframe.loc[last_row_index, last_column_name] = 'Street 2'
+            GPIO.output(self.greens[1],GPIO.LOW)
+            GPIO.output(self.greens[3],GPIO.LOW)
+            GPIO.output(self.reds[1],GPIO.HIGH)
+            GPIO.output(self.reds[3],GPIO.HIGH)
 
     '''
     set_yellow_light()
@@ -116,25 +122,25 @@ class TrafficLight:
     '''
     def set_yellow_light(self,street):
         if street == 'Street 1':
-        #    GPIO.output(self.greens[0],GPIO.LOW)
-        #    GPIO.output(self.greens[2],GPIO.LOW)
-        #    GPIO.output(self.reds[0],GPIO.LOW)
-        #    GPIO.output(self.reds[2],GPIO.LOW)
+            GPIO.output(self.greens[0],GPIO.LOW)
+            GPIO.output(self.greens[2],GPIO.LOW)
+            GPIO.output(self.reds[0],GPIO.LOW)
+            GPIO.output(self.reds[2],GPIO.LOW)
             time.sleep(3)
-          #  GPIO.output(self.greens[0],GPIO.LOW)
-         #   GPIO.output(self.greens[2],GPIO.LOW)
-        #    GPIO.output(self.reds[0],GPIO.LOW)
-       #     GPIO.output(self.reds[2],GPIO.LOW)
+            GPIO.output(self.greens[0],GPIO.LOW)
+            GPIO.output(self.greens[2],GPIO.LOW)
+            GPIO.output(self.reds[0],GPIO.LOW)
+            GPIO.output(self.reds[2],GPIO.LOW)
         elif street == 'Street 2':
-       #     GPIO.output(self.greens[1],GPIO.LOW)
-       #     GPIO.output(self.greens[3],GPIO.LOW)
-       #     GPIO.output(self.reds[1],GPIO.LOW)
-        #    GPIO.output(self.reds[3],GPIO.LOW)
+            GPIO.output(self.greens[1],GPIO.LOW)
+            GPIO.output(self.greens[3],GPIO.LOW)
+            GPIO.output(self.reds[1],GPIO.LOW)
+            GPIO.output(self.reds[3],GPIO.LOW)
             time.sleep(3)
-          #  GPIO.output(self.greens[1],GPIO.LOW)
-          #  GPIO.output(self.greens[3],GPIO.LOW)
-         #   GPIO.output(self.reds[1],GPIO.LOW)
-         #   GPIO.output(self.reds[3],GPIO.LOW)
+            GPIO.output(self.greens[1],GPIO.LOW)
+            GPIO.output(self.greens[3],GPIO.LOW)
+            GPIO.output(self.reds[1],GPIO.LOW)
+            GPIO.output(self.reds[3],GPIO.LOW)
 
     '''
     set_red_light()
@@ -145,16 +151,16 @@ class TrafficLight:
     def set_red_light(self,street):
         if street == 'Street 1':
             self.set_yellow_light('Street 1')
-       #     GPIO.output(self.greens[0],GPIO.HIGH)
-        #    GPIO.output(self.greens[2],GPIO.HIGH)
-        #    GPIO.output(self.reds[0],GPIO.LOW)
-        #    GPIO.output(self.reds[2],GPIO.LOW)
+            GPIO.output(self.greens[0],GPIO.HIGH)
+            GPIO.output(self.greens[2],GPIO.HIGH)
+            GPIO.output(self.reds[0],GPIO.LOW)
+            GPIO.output(self.reds[2],GPIO.LOW)
         elif street == 'Street 2':
             self.set_yellow_light('Street 2')
-         #   GPIO.output(self.greens[1],GPIO.HIGH)
-         #   GPIO.output(self.greens[3],GPIO.HIGH)
-         #   GPIO.output(self.reds[1],GPIO.LOW)
-         #   GPIO.output(self.reds[3],GPIO.LOW)
+            GPIO.output(self.greens[1],GPIO.HIGH)
+            GPIO.output(self.greens[3],GPIO.HIGH)
+            GPIO.output(self.reds[1],GPIO.LOW)
+            GPIO.output(self.reds[3],GPIO.LOW)
 
     '''
     lights_off()
@@ -162,15 +168,15 @@ class TrafficLight:
     Returns: none
     Turns all lights off
     '''
-   # def lights_off(self):
-     #   GPIO.output(self.greens[1],GPIO.HIGH)
-     #   GPIO.output(self.greens[3],GPIO.HIGH)
-     #   GPIO.output(self.reds[1],GPIO.HIGH)
-     #   GPIO.output(self.reds[3],GPIO.HIGH)
-     #   GPIO.output(self.greens[0],GPIO.HIGH)
-      #  GPIO.output(self.greens[2],GPIO.HIGH)
-      #  GPIO.output(self.reds[0],GPIO.HIGH)
-      #  GPIO.output(self.reds[2],GPIO.HIGH)
+    def lights_off(self):
+        GPIO.output(self.greens[1],GPIO.HIGH)
+        GPIO.output(self.greens[3],GPIO.HIGH)
+        GPIO.output(self.reds[1],GPIO.HIGH)
+        GPIO.output(self.reds[3],GPIO.HIGH)
+        GPIO.output(self.greens[0],GPIO.HIGH)
+        GPIO.output(self.greens[2],GPIO.HIGH)
+        GPIO.output(self.reds[0],GPIO.HIGH)
+        GPIO.output(self.reds[2],GPIO.HIGH)
 
     '''
     set_flash_red()
@@ -191,17 +197,17 @@ class TrafficLight:
     Returns: True if it's been over 3 minutes since the last change in lights; otherwise return False
     Calculates the change in time since the last change in lights, and returns True or False depending on if the lights need to change
     '''
-    def last_street_change_time(green_light_list):
+    def last_street_change_time(self):
         last_change_time = None
 
-        for i in range(1, len(green_light_list)):
-            current_street_name, current_time_str = green_light_list[i]
-            previous_street_name, previous_time_str = green_light_list[i - 1]
+        for i in range(1, len(self.green_light_list)):
+            current_street_name, current_time_str = self.green_light_list[i]
+            previous_street_name, previous_time_str = self.green_light_list[i - 1]
 
             if current_street_name != previous_street_name:
                 last_change_time = previous_time_str
                 # Calculate the difference between the current time, and the last swap
-                time_delta = datetime.datetime.now() - last_change_time
+                time_delta = datetime.now() - last_change_time
                 # if time_delta is more than 3 minutes, return True
                 if time_delta > timedelta(minutes=3):
                     return True
@@ -217,7 +223,7 @@ class TrafficLight:
     '''
     def get_last_green(self):
         # The last street with the green light is the last item (street) on the green light list
-        last_street_green = self.green_light_list[[-1][0]]
+        last_street_green = self.green_light_list[-1][0]
         return last_street_green
 
     '''
@@ -240,7 +246,6 @@ class TrafficLight:
                     * No: The street that previously had a green light will now have a red light, and the other street gets red light
     '''
     def set_traffic_lights(self):
-        print(self.traffic_dataframe.iloc[-1])
         # Case 1: All sides have less than 2 cars; intersection will act as a 4-way stop.
         if self.traffic_dataframe.iloc[-1, 1] <= 2 and self.traffic_dataframe.iloc[-1, 2] <= 2 and self.traffic_dataframe.iloc[-1, 3] <= 2 and self.traffic_dataframe.iloc[-1, 4] <= 2:
             # turn all greens and yellows off; all reds  blink to signal 4-way stop
@@ -309,3 +314,4 @@ class TrafficLight:
                     else:
                         self.set_green_light('Street 1')
                         print("Street 1 gets a green light.")
+        self.traffic_dataframe.to_csv('Traffic_Data',index=False,mode='w')
