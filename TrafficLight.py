@@ -4,7 +4,7 @@ Traffic Sign Class
 import pandas as pd
 import random
 import time
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 from datetime import datetime, timedelta
 
 class TrafficLight:
